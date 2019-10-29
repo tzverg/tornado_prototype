@@ -8,9 +8,17 @@ public class UIController : MonoBehaviour
     [SerializeField] private Text score;
     [SerializeField] private Text timer;
 
-    public void SetScoreValue(int value)
+    private int scoreNum = 0;
+
+    public void AddScore(int value)
     {
-        score.text = "score: " + value;
+        scoreNum += value;
+        UpdateScore();
+    }
+
+    public void UpdateScore()
+    {
+        score.text = "score: " + scoreNum;
     }
 
     public void SetTimerValue(int value)
