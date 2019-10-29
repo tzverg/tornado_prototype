@@ -75,6 +75,7 @@
     <Compile Include="Assets\Polygon Arsenal\Scripts\PolygonSoundSpawn.cs" />
     <Compile Include="Assets\Scripts\CoreGameplayController.cs" />
     <Compile Include="Assets\Scripts\TornadoController.cs" />
+    <Compile Include="Assets\Scripts\UIController.cs" />
     <None Include="Assets\Polygon Arsenal\Shaders\Standard\PolyLitSurface.shader" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/work/unity/Suck it 2/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>

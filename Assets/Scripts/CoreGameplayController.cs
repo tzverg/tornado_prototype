@@ -2,15 +2,43 @@
 
 public class CoreGameplayController : MonoBehaviour
 {
-    // Start is called before the first frame update
+    [SerializeField] private int timerStartValue;
+    [SerializeField] private GameObject UIGO;
+
+    private UIController uiController;
+    private float timerValue;
+
     void Start()
     {
-        
+        uiController = UIGO.GetComponent<UIController>();
+
+        if (uiController != null)
+        {
+            timerValue = timerStartValue;
+
+            uiController.SetScoreValue(0);
+            uiController.SetTimerValue((int)timerValue);
+
+            Time.timeScale = 1;
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        UpdateTimer();
+    }
+
+    private void UpdateTimer()
+    {
+        if (timerValue > 0)
+        {
+            timerValue -= Time.deltaTime;
+            uiController.SetTimerValue((int)timerValue);
+        }
+        else
+        {
+            Time.timeScale = 0;
+            uiController.ShowMenuPanel();
+        }
     }
 }
