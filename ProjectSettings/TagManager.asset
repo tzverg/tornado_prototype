@@ -6,6 +6,7 @@ TagManager:
   tags:
   - RedMarker
   - GreenMarker
+  - BlackMarker
   layers:
   - Default
   - TransparentFX

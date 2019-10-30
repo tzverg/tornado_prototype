@@ -7,6 +7,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private GameObject menuPanel;
     [SerializeField] private Text score;
     [SerializeField] private Text timer;
+    [SerializeField] private Text debugT;
 
     private int scoreNum = 0;
 
@@ -24,6 +25,11 @@ public class UIController : MonoBehaviour
     public void SetTimerValue(int value)
     {
         timer.text = "time: " + value;
+    }
+
+    public void SetDebugText(string newText)
+    {
+        debugT.text = newText;
     }
 
     public void ShowMenuPanel()

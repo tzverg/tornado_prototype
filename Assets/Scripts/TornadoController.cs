@@ -1,37 +1,29 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
-
-[Serializable]
-public class Boundary
-{
-    public float xMin, xMax, zMin, zMax;
-}
-
-[Serializable]
-public class BlockerModifiers
-{
-    public float modR, modG;
-}
 
 public class TornadoController : MonoBehaviour
 {
     [Range(0F, 2F)] [SerializeField] private float tornadoScale = 1F;
     private float tornadoNextScale;
-    [SerializeField] private float tornadoMotionSpeed;
+    [SerializeField] private bool tornadoTapMotion;
 
-    [SerializeField] private GameObject UIGO;
+    public GameObject UIGO;
+    public GameObject CoreGameplayCGO;
+
+    private bool mousePosSaved = false;
 
     private UIController uiController;
+    private CoreGameplayController coreGameplayC;
     private Rigidbody tornadoRB;
 
-    public Boundary boundary;
-    public BlockerModifiers modifiers;
+    private RaycastHit mouseHit;
+    private Vector3 mousePosStart;
 
     void Start()
     {
         tornadoRB = GetComponent<Rigidbody>();
         uiController = UIGO.GetComponent<UIController>();
+        coreGameplayC = CoreGameplayCGO.GetComponent<CoreGameplayController>();
     }
 
     public float GetTornadoScale()
@@ -41,74 +33,85 @@ public class TornadoController : MonoBehaviour
 
     void FixedUpdate()
     {
-        //SetTornadoLocalScale();
         MoveTornado();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Trigger with " + other.name);
-
         if (other.tag == "RedMarker")
         {
             StartCoroutine(FadeCoroutine(other.gameObject));
-            ScaleDownTornado();
+            //ScaleDownTornado();   //TODO
+            coreGameplayC.EndTheGame();
         }
         else if (other.tag == "GreenMarker")
         {
             StartCoroutine(FadeCoroutine(other.gameObject));
             ScaleUpTornado();
         }
+        else if (other.tag == "BlackMarker")
+        {
+            //StartCoroutine(FadeCoroutine(other.gameObject));
+            Destroy(other.gameObject);
+            coreGameplayC.CreateTornado(tornadoRB.transform.position);
+            Destroy(gameObject);
+        }
     }
 
     private void ScaleDownTornado()
     {
-        tornadoNextScale = tornadoScale - modifiers.modR;
+        tornadoNextScale = tornadoScale - coreGameplayC.modifiers.modR;
         StartCoroutine(ScaleDownTornadoCoroutine());
         uiController.AddScore(-5);
     }
 
     private void ScaleUpTornado()
     {
-        tornadoNextScale = tornadoScale + modifiers.modG;
+        tornadoNextScale = tornadoScale + coreGameplayC.modifiers.modG;
         StartCoroutine(ScaleUpTornadoCoroutine());
         uiController.AddScore(5);
     }
 
     private IEnumerator ScaleUpTornadoCoroutine()
     {
-        for (float value = tornadoScale; value < tornadoNextScale; value += 0.05f)
+        for (float value = tornadoScale; value <= tornadoNextScale; value += 0.05f)
         {
             tornadoScale = value;
             SetTornadoLocalScale();
             yield return new WaitForSeconds(.1f);
         }
+
+        tornadoScale = tornadoNextScale;
+        SetTornadoLocalScale();
     }
 
     private IEnumerator ScaleDownTornadoCoroutine()
     {
-        for (float value = tornadoScale; value > tornadoNextScale; value -= 0.05f)
+        for (float value = tornadoScale; value >= tornadoNextScale; value -= 0.05f)
         {
             tornadoScale = value;
             SetTornadoLocalScale();
             yield return new WaitForSeconds(.1f);
         }
+
+        tornadoScale = tornadoNextScale;
+        SetTornadoLocalScale();
     }
 
     private IEnumerator FadeCoroutine(GameObject targetGO)
     {
         for (float f = 1f; f >= 0; f -= 0.1f)
         {
-            Renderer renderer = targetGO.GetComponent<Renderer>();
-            Color c = renderer.material.color;
-            c.a = f;
-            renderer.material.color = c;
-            if (f <= .1F)
+            if (targetGO != null)
             {
-                Destroy(targetGO);
+                Renderer renderer = targetGO.GetComponent<Renderer>();
+                Color c = renderer.material.color;
+                c.a = f;
+                renderer.material.color = c;
             }
             yield return new WaitForSeconds(.1f);
         }
+        Destroy(targetGO);
     }
 
     private void SetTornadoLocalScale()
@@ -118,9 +121,9 @@ public class TornadoController : MonoBehaviour
             transform.localScale = new Vector3(tornadoScale, 1F, tornadoScale);
         }
 
-        if (tornadoScale <= 0)
+        if (tornadoScale <= 0F || tornadoScale >= 2F)
         {
-            Debug.Log("Tornado is gone");
+            coreGameplayC.EndTheGame();
         }
     }
 
@@ -128,15 +131,39 @@ public class TornadoController : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mousePos.y = 0F;
+            if (tornadoTapMotion)
+            {
+                Vector3 mousePos = Vector3.zero;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            tornadoRB.position = Vector3.Lerp(tornadoRB.position, mousePos, Time.deltaTime * tornadoMotionSpeed);
+                if (Physics.Raycast(ray, out mouseHit))
+                {
+                    mousePos = mouseHit.point;
+                }
+
+                tornadoRB.position = Vector3.Lerp(tornadoRB.position, mousePos, Time.deltaTime * coreGameplayC.config.tornadoMotionSpeed);
+            }
+            else
+            {
+                if (!mousePosSaved)
+                {
+                    mousePosStart = Input.mousePosition;
+                    mousePosSaved = true;
+                }
+                Vector3 tapDirection = Input.mousePosition - mousePosStart;
+                Vector3 movePoint = new Vector3(tornadoRB.position.x + tapDirection.x, 0F, tornadoRB.position.z + tapDirection.y);
+                tornadoRB.position = Vector3.Lerp(tornadoRB.position, movePoint, Time.deltaTime * coreGameplayC.config.tornadoMotionSpeed);
+            }
             tornadoRB.position = new Vector3(
-                Mathf.Clamp(tornadoRB.position.x, boundary.xMin, boundary.xMax),
+                Mathf.Clamp(tornadoRB.position.x, coreGameplayC.config.xMin, coreGameplayC.config.xMax),
                 0F,
-                Mathf.Clamp(tornadoRB.position.z, boundary.zMin, boundary.zMax)
+                Mathf.Clamp(tornadoRB.position.z, coreGameplayC.config.zMin, coreGameplayC.config.zMax)
             );
+        }
+        else
+        {
+            mousePosSaved = false;
+            tornadoRB.velocity = Vector3.zero;
         }
     }
 }
