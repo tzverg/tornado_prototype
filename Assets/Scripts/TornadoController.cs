@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class TornadoController : MonoBehaviour
 {
-    [Range(0F, 2F)] [SerializeField] private float tornadoScale = 1F;
+    [Range(0F, 2F)] public float tornadoScale = 1F;
     private float tornadoNextScale;
     [SerializeField] private bool tornadoTapMotion;
 
@@ -53,7 +53,7 @@ public class TornadoController : MonoBehaviour
         {
             //StartCoroutine(FadeCoroutine(other.gameObject));
             Destroy(other.gameObject);
-            coreGameplayC.CreateTornado(tornadoRB.transform.position);
+            coreGameplayC.CreateTornado(tornadoRB.transform.position, tornadoRB.transform.localScale);
             Destroy(gameObject);
         }
     }
@@ -151,6 +151,7 @@ public class TornadoController : MonoBehaviour
                     mousePosSaved = true;
                 }
                 Vector3 tapDirection = Input.mousePosition - mousePosStart;
+                tapDirection.Normalize();
                 Vector3 movePoint = new Vector3(tornadoRB.position.x + tapDirection.x, 0F, tornadoRB.position.z + tapDirection.y);
                 tornadoRB.position = Vector3.Lerp(tornadoRB.position, movePoint, Time.deltaTime * coreGameplayC.config.tornadoMotionSpeed);
             }
