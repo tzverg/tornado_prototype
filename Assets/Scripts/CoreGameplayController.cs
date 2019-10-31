@@ -167,12 +167,19 @@ public class CoreGameplayController : MonoBehaviour
             {
                 Vector3 newBlockerPos = new Vector3(UnityEngine.Random.Range(config.xMin, config.xMax), 1F, 12F);
                 GameObject newBlocker = Instantiate(GetRandomBlocker(), newBlockerPos, blockersGO.transform.rotation, blockersGO.transform);
+                newBlocker.transform.localScale = GetRandomScale();
                 newBlocker.transform.SetParent(blockersGO.transform);
                 newBlocker.GetComponent<Rigidbody>().velocity += Vector3.back * boxMotionSpeed;
             }
 
             yield return new WaitForSeconds(UnityEngine.Random.Range(config.summonDelayMin, config.summonDelayMax));
         }
+    }
+
+    private Vector3 GetRandomScale()
+    {
+        float randomSeed = UnityEngine.Random.Range(0.5F, 2F);
+        return new Vector3(randomSeed, 1F, randomSeed);
     }
 
     private void UpdateTimer()

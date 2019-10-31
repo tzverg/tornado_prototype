@@ -40,21 +40,36 @@ public class TornadoController : MonoBehaviour
     {
         if (other.tag == "RedMarker")
         {
-            StartCoroutine(FadeCoroutine(other.gameObject));
+            //StartCoroutine(FadeCoroutine(other.gameObject));
             //ScaleDownTornado();   //TODO
+            Destroy(other.gameObject);
             coreGameplayC.EndTheGame();
         }
         else if (other.tag == "GreenMarker")
         {
-            StartCoroutine(FadeCoroutine(other.gameObject));
-            ScaleUpTornado();
+            if (other.transform.localScale.x <= tornadoScale)
+            {
+                //StartCoroutine(FadeCoroutine(other.gameObject));
+                Destroy(other.gameObject);
+                ScaleUpTornado();
+            }
+            else
+            {
+                coreGameplayC.EndTheGame();
+            }
         }
         else if (other.tag == "BlackMarker")
         {
-            //StartCoroutine(FadeCoroutine(other.gameObject));
-            Destroy(other.gameObject);
-            coreGameplayC.CreateTornado(tornadoRB.transform.position, tornadoRB.transform.localScale);
-            Destroy(gameObject);
+            if (other.transform.localScale.x <= tornadoScale)
+            {
+                Destroy(other.gameObject);
+                coreGameplayC.CreateTornado(tornadoRB.transform.position, tornadoRB.transform.localScale);
+                Destroy(gameObject);
+            }
+            else
+            {
+                coreGameplayC.EndTheGame();
+            }
         }
     }
 
