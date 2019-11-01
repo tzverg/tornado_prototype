@@ -166,7 +166,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89355946}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
@@ -414,37 +414,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ee5cfcd786f3a241a5349836f065323, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timerStartValue: 60
-  boxMotionSpeed: 2
   UIGO: {fileID: 1845198780}
-  blockersGO: {fileID: 283244881}
-  prefabBoxR: {fileID: 6199326652059755257, guid: 413853710b6cdf046bd1452e73fb13ec,
-    type: 3}
-  prefabBoxG: {fileID: 5121470052911008796, guid: 97d0feb16833aef43ba32a8470ca6add,
-    type: 3}
-  prefabBoxB: {fileID: 7548429794840939482, guid: 1cdd96d62ac185b44b073d9ad377f545,
-    type: 3}
-  prefabTornadoL: {fileID: 9173065022621489626, guid: 87fae29e125b1874ca0f25e967c7dd44,
-    type: 3}
-  prefabTornadoF: {fileID: 6452684281337934018, guid: 2c5c7dbd1feb53745802b3f03012a3ee,
-    type: 3}
-  prefabTornadoI: {fileID: 1725833605493554188, guid: 6e7530881ffde2a4ca1ad8086f730833,
-    type: 3}
-  modifiers:
+  config:
+    borders:
+      xMin: -5
+      xMax: 5
+      zMin: -12
+      zMax: 10
     modR: 0.1
     modG: 0.1
-  config:
-    xMin: -5
-    xMax: 5
-    zMin: -12
-    zMax: 10
-    modR: 5
-    modG: 5
     tornadoMotionSpeed: 5
-    summonDelayMin: 1
+    minSwipeDistance: 0.3
+    summonDelayMin: 2
     summonDelayMax: 3
-    blockerMaxNumber: 5
+    blockerMaxNumber: 10
+    boxMotionSpeed: 2
+    timerStartValue: 5
     tornadoT: 0
+  prefabs:
+    blockersGO: {fileID: 283244881}
+    blockerRGO: {fileID: 6199326652059755257, guid: 413853710b6cdf046bd1452e73fb13ec,
+      type: 3}
+    blockerGGO: {fileID: 5121470052911008796, guid: 97d0feb16833aef43ba32a8470ca6add,
+      type: 3}
+    blockerBGO: {fileID: 7548429794840939482, guid: 1cdd96d62ac185b44b073d9ad377f545,
+      type: 3}
+    tornadoLGO: {fileID: 9173065022621489626, guid: 87fae29e125b1874ca0f25e967c7dd44,
+      type: 3}
+    tornadoFGO: {fileID: 6452684281337934018, guid: 2c5c7dbd1feb53745802b3f03012a3ee,
+      type: 3}
+    tornadoIGO: {fileID: 1725833605493554188, guid: 6e7530881ffde2a4ca1ad8086f730833,
+      type: 3}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -896,7 +896,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1549997752
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1118,11 +1118,11 @@ RectTransform:
   m_Father: {fileID: 89355947}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.5}
-  m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 15, y: 0}
-  m_SizeDelta: {x: 175, y: 75}
-  m_Pivot: {x: 0, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 300, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1953405236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1234,7 +1234,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1983922729
 RectTransform:
   m_ObjectHideFlags: 0

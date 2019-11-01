@@ -73,6 +73,7 @@
     <Compile Include="Assets\Polygon Arsenal\Scripts\PolygonLightFlicker.cs" />
     <Compile Include="Assets\Polygon Arsenal\Scripts\PolygonRotation.cs" />
     <Compile Include="Assets\Polygon Arsenal\Scripts\PolygonSoundSpawn.cs" />
+    <Compile Include="Assets\Scripts\BlockerModel.cs" />
     <Compile Include="Assets\Scripts\CoreGameplayController.cs" />
     <Compile Include="Assets\Scripts\TornadoController.cs" />
     <Compile Include="Assets\Scripts\UIController.cs" />
