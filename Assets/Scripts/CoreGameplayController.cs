@@ -138,10 +138,10 @@ public class CoreGameplayController : MonoBehaviour
                 }
                 else
                 {
-                    uiController.SetTierLable(config.tornadoTier.ToString());
                     UpdateBlockerPrefab();
                     UpdateXPLable();
                 }
+                uiController.SetTierLable(config.tornadoTier.ToString());
 
                 return true;
             }
@@ -330,6 +330,7 @@ public class CoreGameplayController : MonoBehaviour
                 newBlockerModel.XpForDestroy = (int)newBlockerTier + 1;
                 newBlocker.transform.SetParent(prefabs.blockersGO.transform);
                 newBlocker.transform.localScale = GetBlockerScale(newBlocker);
+                newBlocker.transform.localRotation = Quaternion.Euler(0F, UnityEngine.Random.Range(0, 360F), 0F);
                 newBlocker.GetComponentInChildren<Rigidbody>().velocity += Vector3.back * config.boxMotionSpeed;
             }
 

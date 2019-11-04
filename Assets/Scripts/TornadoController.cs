@@ -227,6 +227,11 @@ public class TornadoController : MonoBehaviour
                             swipeDir.Normalize();
                             tornadoRB.velocity = swipeDir * coreGameplayC.config.tornadoMotionSpeed;
                         }
+                        else
+                        {
+                            pointerPosStart = Camera.main.ScreenToWorldPoint(currentTouch.position);
+                            tornadoRB.velocity = Vector3.zero;
+                        }
                         break;
                     case TouchPhase.Ended:
                         tornadoRB.velocity = Vector3.zero;
