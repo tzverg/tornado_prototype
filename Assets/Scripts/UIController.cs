@@ -5,9 +5,9 @@ using UnityEngine.SceneManagement;
 public class UIController : MonoBehaviour
 {
     [SerializeField] private GameObject menuPanel;
-    [SerializeField] private Text score;
-    [SerializeField] private Text timer;
-    [SerializeField] private Text debugT;
+    [SerializeField] private Text scoreLable;
+    [SerializeField] private Text xpLable;
+    [SerializeField] private Text tierLable;
 
     private int scoreNum = 0;
 
@@ -19,17 +19,17 @@ public class UIController : MonoBehaviour
 
     public void UpdateScore()
     {
-        score.text = "score: " + scoreNum;
+        scoreLable.text = "score: " + scoreNum;
     }
 
-    public void SetTimerValue(int value)
+    public void SetXPLable(string value)
     {
-        timer.text = "time: " + value;
+        xpLable.text = "XP: " + value;
     }
 
-    public void SetDebugText(string newText)
+    public void SetTierLable(string newTier)
     {
-        debugT.text = newText;
+        tierLable.text = "Tier: " + newTier;
     }
 
     public void ShowMenuPanel()
@@ -44,7 +44,7 @@ public class UIController : MonoBehaviour
 
     public void ExitButton()
     {
-        #if UNITY_ANDROID
+        #if UNITY_ANDROID || UNITY_STANDALONE
         Application.Quit();
         #endif
     }

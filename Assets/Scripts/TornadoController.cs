@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class TornadoController : MonoBehaviour
 {
-    [Range(0F, 2F)] public float tornadoScale = 1F;
-    private float tornadoNextScale;
     [SerializeField] private bool tornadoTapMotion;
+
+    public float tornadoScale;
+    private float tornadoNextScale;
 
     public GameObject UIGO;
     public GameObject CoreGameplayCGO;
@@ -54,46 +55,52 @@ public class TornadoController : MonoBehaviour
         }
         else if (other.tag == "GreenMarker")
         {
-            if (other.transform.localScale.x <= tornadoScale)
-            {
-                //StartCoroutine(FadeCoroutine(other.gameObject));
-                Destroy(other.gameObject);
-                ScaleUpTornado();
-            }
-            else
-            {
-                coreGameplayC.EndTheGame();
-            }
+            //StartCoroutine(FadeCoroutine(other.gameObject));
+            AddXPForDestroy(other.gameObject);
+            uiController.AddScore(5);
+            Destroy(other.gameObject);
+            //ScaleUpTornado();
         }
         else if (other.tag == "BlackMarker")
         {
-            if (other.transform.localScale.x <= tornadoScale)
-            {
-                Destroy(other.gameObject);
-                coreGameplayC.CreateTornado(tornadoRB.transform.position, tornadoRB.transform.localScale);
-                Destroy(gameObject);
-            }
-            else
-            {
-                coreGameplayC.EndTheGame();
-            }
+            Destroy(other.gameObject);
+            coreGameplayC.CreateTornado(tornadoRB.transform.position, tornadoRB.transform.localScale);
+            Destroy(gameObject);
+        }
+    }
+
+    private void AddXPForDestroy(GameObject target)
+    {
+        BlockerModel targetBM = target.GetComponent<BlockerModel>();
+        if (targetBM != null)
+        {
+            coreGameplayC.AddXP(targetBM.XpForDestroy);
+        }
+
+        if (coreGameplayC.UpdateTornadoTier())
+        {
+            ScaleUpTornado();
         }
     }
 
     private void ScaleDownTornado()
     {
-        tornadoNextScale = tornadoScale - coreGameplayC.config.modR;
+        //tornadoNextScale = tornadoScale - coreGameplayC.config.modR;
+        int tornadoScaleID = (int)coreGameplayC.config.tornadoTier;
+        float tornadoScaleLevel = coreGameplayC.config.scaleLevel[tornadoScaleID];
+        tornadoNextScale = tornadoScaleLevel;
+        //Debug.Log("tornadoScaleLevel: " + (TierType)tornadoScaleID);
         StartCoroutine(ScaleDownTornadoCoroutine());
-        uiController.AddScore(-5);
     }
 
     private void ScaleUpTornado()
     {
-        tornadoNextScale = tornadoScale + coreGameplayC.config.modG;
+        //tornadoNextScale = tornadoScale + coreGameplayC.config.modG;
+        int tornadoScaleID = (int)coreGameplayC.config.tornadoTier;
+        float tornadoScaleLevel = coreGameplayC.config.scaleLevel[tornadoScaleID];
+        tornadoNextScale = tornadoScaleLevel;
+        //Debug.Log("tornadoScaleLevel: " + (TierType)tornadoScaleID);
         StartCoroutine(ScaleUpTornadoCoroutine());
-        uiController.AddScore(5);
-        coreGameplayC.SetTornadoTier(tornadoScale);
-        coreGameplayC.UpdateBlockerPrefab();
     }
 
     private IEnumerator ScaleUpTornadoCoroutine()
@@ -143,11 +150,6 @@ public class TornadoController : MonoBehaviour
         if (transform.localScale.x != tornadoScale || transform.localScale.y != tornadoScale)
         {
             transform.localScale = new Vector3(tornadoScale, tornadoScale, tornadoScale);
-        }
-
-        if (tornadoScale <= 0F || tornadoScale >= 2F)
-        {
-            coreGameplayC.EndTheGame();
         }
     }
 

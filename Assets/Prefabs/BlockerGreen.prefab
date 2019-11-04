@@ -201,3 +201,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockerTier: 0
+  xpForDestroy: 2
