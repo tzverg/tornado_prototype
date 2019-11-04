@@ -4,100 +4,120 @@ using UnityEngine;
 
 public class TornadoController : MonoBehaviour
 {
-    [SerializeField] private bool tornadoTapMotion;
+    //[SerializeField] private bool tornadoTapMotion;
 
-    public float tornadoScale;
+	public float TornadoScale => _tornadoScale;
+
+    public float _tornadoScale;
     private float tornadoNextScale;
 
-    public GameObject UIGO;
-    public GameObject CoreGameplayCGO;
-
+	[SerializeField]
     private UIController uiController;
-    private CoreGameplayController coreGameplayC;
-    private Rigidbody tornadoRB;
+	[SerializeField]
+    private CoreGameplayController coreGameplayController;
+    //private Rigidbody tornadoRB;
 
-    private RaycastHit mouseHit;
+    //private RaycastHit mouseHit;
 
     private Vector3 pointerPosStart;
-    private Vector3 pointerPosEnd;
+    //private Vector3 pointerPosEnd;
 
-    private bool pointerPosSaved = false;
+    //private bool pointerPosSaved = false;
 
     // check mouse motion
-    private bool timerLaunched = false;
-    private Vector3 pointerTimerPos;
+    //private bool timerLaunched = false;
+    //private Vector3 pointerTimerPos;
 
-    void Start()
-    {
-        tornadoRB = GetComponent<Rigidbody>();
-        uiController = UIGO.GetComponent<UIController>();
-        coreGameplayC = CoreGameplayCGO.GetComponent<CoreGameplayController>();
-    }
+	private float _tornadoMovingSpeed = 1.0f;
 
-    public float GetTornadoScale()
-    {
-        return tornadoScale;
-    }
-
-    void FixedUpdate()
-    {
-        MoveTornado();
-    }
+	private bool _mouseIsPressed = false;
+	private float _minLenghtOfMovingVector = 0.1f;
+	
+	void Update()
+	{
+		if (Input.GetMouseDown(0))
+        {
+			_mouseIsPressed = true;
+			pointerPosStart = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		}
+		else if (Input.GetMouseUp(0))
+        {
+			_mouseIsPressed = false;
+		}
+		
+		if(_mouseIsPressed)
+		{
+			MoveTornado();
+		}
+	}
+	
+	private void MoveTornado()
+	{
+		Vector3 pointerPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		Vector3 diff = pointerPosStart - pointerPos;
+		diff.y = 0f;
+		if(diff.magnit > _minLenghtOfMovingVector)
+		{
+			Vector3 newPosition = transform.position + diff * _tornadoMovingSpeed * Time.deltaTime;
+			newPosition = ClampTornadoPosition(newPosition);
+			transform.position = newPosition;
+		}
+	}
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "RedMarker")
-        {
-            //StartCoroutine(FadeCoroutine(other.gameObject));
-            //ScaleDownTornado();   //TODO
-            Destroy(other.gameObject);
-            coreGameplayC.EndTheGame();
-        }
-        else if (other.tag == "GreenMarker")
-        {
-            //StartCoroutine(FadeCoroutine(other.gameObject));
-            AddXPForDestroy(other.gameObject);
-            uiController.AddScore(5);
-            Destroy(other.gameObject);
-            //ScaleUpTornado();
-        }
-        else if (other.tag == "BlackMarker")
-        {
-            Destroy(other.gameObject);
-            coreGameplayC.CreateTornado(tornadoRB.transform.position, tornadoRB.transform.localScale);
-            Destroy(gameObject);
-        }
+		BlockerModel blocker = other.gameObject.GetComponent<BlockerModel>();
+		if(blocker != null)
+		{
+			switch(other.tag)
+			{
+				//TODO: move from tag to enum in BlockerModel
+				case "RedMarker": OnRedMarker(blocker); break;
+				case "GreenMarker": OnGreenMarker(blocker); break;
+				case "BlackMarker": OnBlackMarker(blocker); break;
+			}
+		}
     }
+	
+	private void OnRedMarker(BlockerModel blocker)
+	{
+		Destroy(blocker.gameObject);
+        coreGameplayController.EndTheGame();
+	}
+	
+	private void OnGreenMarker(BlockerModel blocker)
+	{
+		AddXPForDestroy(blocker.gameObject);
+        uiController.AddScore(5);
+        Destroy(blocker.gameObject);
+	}
+	
+	private void OnBlackMarker(BlockerModel blocker)
+	{
+		Destroy(blocker.gameObject);
+		coreGameplayController.CreateTornado(transform.position, transform.localScale);
+		Destroy(gameObject);
+	}
 
-    private void AddXPForDestroy(GameObject target)
+    private void AddXPByDestroy(int value)
     {
-        BlockerModel targetBM = target.GetComponent<BlockerModel>();
-        if (targetBM != null)
+        if (coreGameplayController != null)
         {
-            coreGameplayC.AddXP(targetBM.XpForDestroy);
+            coreGameplayController.AddXP(value);
         }
 
-        if (coreGameplayC.UpdateTornadoTier())
+		//TODO: move xp and level to tornado model, and checking levelup in it
+        if (coreGameplayController.UpdateTornadoTier())
         {
             ScaleUpTornado();
         }
     }
 
-    private void ScaleDownTornado()
-    {
-        //tornadoNextScale = tornadoScale - coreGameplayC.config.modR;
-        int tornadoScaleID = (int)coreGameplayC.config.tornadoTier;
-        float tornadoScaleLevel = coreGameplayC.config.scaleLevel[tornadoScaleID];
-        tornadoNextScale = tornadoScaleLevel;
-        //Debug.Log("tornadoScaleLevel: " + (TierType)tornadoScaleID);
-        StartCoroutine(ScaleDownTornadoCoroutine());
-    }
-
     private void ScaleUpTornado()
     {
         //tornadoNextScale = tornadoScale + coreGameplayC.config.modG;
-        int tornadoScaleID = (int)coreGameplayC.config.tornadoTier;
-        float tornadoScaleLevel = coreGameplayC.config.scaleLevel[tornadoScaleID];
+        int tornadoScaleID = (int)coreGameplayController.config.tornadoTier;
+        float tornadoScaleLevel = coreGameplayController.config.scaleLevel[tornadoScaleID];
         tornadoNextScale = tornadoScaleLevel;
         //Debug.Log("tornadoScaleLevel: " + (TierType)tornadoScaleID);
         StartCoroutine(ScaleUpTornadoCoroutine());
@@ -106,19 +126,6 @@ public class TornadoController : MonoBehaviour
     private IEnumerator ScaleUpTornadoCoroutine()
     {
         for (float value = tornadoScale; value <= tornadoNextScale; value += 0.05f)
-        {
-            tornadoScale = value;
-            SetTornadoLocalScale();
-            yield return new WaitForSeconds(.1f);
-        }
-
-        tornadoScale = tornadoNextScale;
-        SetTornadoLocalScale();
-    }
-
-    private IEnumerator ScaleDownTornadoCoroutine()
-    {
-        for (float value = tornadoScale; value >= tornadoNextScale; value -= 0.05f)
         {
             tornadoScale = value;
             SetTornadoLocalScale();
@@ -153,103 +160,11 @@ public class TornadoController : MonoBehaviour
         }
     }
 
-    private void MoveTornado()
+    private Vector3 ClampTornadoPosition(Vector3 position)
     {
-        if (Input.GetMouseButton(0))
-        {
-            if (tornadoTapMotion)
-            {
-                Vector3 mousePos = Vector3.zero;
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Borders borders = coreGameplayController.config.borders;
 
-                if (Physics.Raycast(ray, out mouseHit))
-                {
-                    mousePos = mouseHit.point;
-                }
-
-                tornadoRB.position = Vector3.Lerp(tornadoRB.position, mousePos, Time.deltaTime * coreGameplayC.config.tornadoMotionSpeed);
-            }
-            else
-            {
-                #if UNITY_EDITOR_WIN || UNITY_STANDALONE
-                MouseMotion();
-                #elif  UNITY_ANDROID
-                TouchMotion();
-                #endif
-            }
-            ClampTornadoPosition();
-        }
-        else
-        {
-            pointerPosSaved = false;
-            tornadoRB.velocity = Vector3.zero;
-        }
-    }
-
-    private void MouseMotion()
-    {
-        if (!pointerPosSaved)
-        {
-            pointerPosStart = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            pointerPosSaved = true;
-        }
-
-        if (Vector3.Distance(pointerPosStart, Input.mousePosition) > coreGameplayC.config.minSwipeDistance)
-        {
-            Vector3 pointerPosLast = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 swipeDir = pointerPosLast - pointerPosStart;
-            swipeDir.y = 0.1F;
-            swipeDir.Normalize();
-
-            tornadoRB.velocity = swipeDir * coreGameplayC.config.tornadoMotionSpeed;
-        }
-    }
-
-    private void TouchMotion()
-    {
-        if (Input.touchCount > 0)
-        {
-            for (int cnt = 0; cnt < Input.touchCount; cnt++)
-            {
-                Touch currentTouch = Input.GetTouch(cnt);
-
-                switch (currentTouch.phase)
-                {
-                    case TouchPhase.Began:
-                        pointerPosStart = Camera.main.ScreenToWorldPoint(currentTouch.position);
-                        break;
-                    case TouchPhase.Moved:
-                        pointerPosEnd = Camera.main.ScreenToWorldPoint(currentTouch.position);
-                        if (Vector3.Distance(pointerPosStart, pointerPosEnd) > coreGameplayC.config.minSwipeDistance)
-                        {
-                            Vector3 swipeDir = pointerPosEnd - pointerPosStart;
-                            swipeDir.y = 0.1F;
-                            swipeDir.Normalize();
-                            tornadoRB.velocity = swipeDir * coreGameplayC.config.tornadoMotionSpeed;
-                        }
-                        else
-                        {
-                            pointerPosStart = Camera.main.ScreenToWorldPoint(currentTouch.position);
-                            tornadoRB.velocity = Vector3.zero;
-                        }
-                        break;
-                    case TouchPhase.Ended:
-                        tornadoRB.velocity = Vector3.zero;
-                        break;
-                    case TouchPhase.Stationary:
-                        pointerPosStart = Camera.main.ScreenToWorldPoint(currentTouch.position);
-                        tornadoRB.velocity = Vector3.zero;
-                        break;
-                }
-            }
-        }
-    }
-
-    private void ClampTornadoPosition()
-    {
-        Borders borders = coreGameplayC.config.borders;
-
-        tornadoRB.position = new Vector3(
+        return new Vector3(
             Mathf.Clamp(tornadoRB.position.x, borders.xMin, borders.xMax),
             0F,
             Mathf.Clamp(tornadoRB.position.z, borders.zMin, borders.zMax)

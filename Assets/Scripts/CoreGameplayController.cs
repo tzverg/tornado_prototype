@@ -28,9 +28,12 @@ public class Configurations
     public int timerStartValue;
     public int currentXP = 0;
 
+	//TODO: change it to progreesive by xpMultipler
     public int[] xpTiers = { 5, 10, 15, 20 };
 
     public TornadoType tornadoType;
+	
+	//TODO: change TierType to int
     public TierType tornadoTier;
 }
 
