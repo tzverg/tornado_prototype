@@ -29,12 +29,12 @@ public class Configurations
     public int currentXP = 0;
 
 	//TODO: change it to progreesive by xpMultipler
-    public int[] xpTiers = { 5, 10, 15, 20 };
+    //public int[] xpTiers = { 20, 10, 15, 20 };
 
     public TornadoType tornadoType;
 	
 	//TODO: change TierType to int
-    public TierType tornadoTier;
+    public int tornadoTier;
 }
 
 [Serializable]
@@ -61,16 +61,19 @@ public class CoreGameplayController : MonoBehaviour
     private UIController uiController;
     private float timerValue;
 
+    private int _scores = 0;
+    private int _tornadoLevel = 1;
+
     void Start()
     {
         uiController = UIGO.GetComponent<UIController>();
 
         if (uiController != null)
         {
-            timerValue = config.timerStartValue;
+            //timerValue = config.timerStartValue;
 
-            uiController.UpdateScore();
-            uiController.SetTierLable(config.tornadoTier.ToString());
+            //uiController.UpdateScore();
+            //uiController.SetTierLable(config.tornadoTier.ToString());
             //uiController.SetTimerValue((int)timerValue);
 
             Time.timeScale = 1;
@@ -86,73 +89,24 @@ public class CoreGameplayController : MonoBehaviour
         return (T)v.GetValue(new System.Random().Next(v.Length));
     }
 
-    public void AddXP(int xpValue)
+    public void AddScores(int value)
     {
-        config.currentXP += xpValue;
-    }
-
-    private void UpdateXPLable()
-    {
-        int tierXP = config.xpTiers[(int)config.tornadoTier];
-        string resultValue = config.currentXP + " / " + tierXP;
-        uiController.SetXPLable(resultValue);
+        _scores += value;
+        uiController.SetScoreLable(_scores);
     }
 
     public void CreateTornado(Vector3 tornadoPos, Vector3 tornadoScale/*, TornadoType newType*/)
     {
-        TornadoType newType = GetRandomTornado();   //For Test
+        //TornadoType newType = GetRandomTornado();   //For Test
+        TornadoType newType = TornadoType.Lightning;   //For Test
 
-        config.tornadoType = newType;
+        //config.tornadoType = newType;
 
         GameObject newTornado = Instantiate(GetTornadoPrefab(newType));
         newTornado.transform.localScale = tornadoScale;
 
         TornadoController newTornadoC = newTornado.GetComponent<TornadoController>();
-        newTornadoC.UIGO = UIGO;
-        newTornadoC.CoreGameplayCGO = gameObject;
-        newTornadoC.tornadoScale = tornadoScale.x;
-
-        UpdateTornadoTier();
-    }
-
-    public bool UpdateTornadoTier()
-    {
-        //for (int cnt = 0; cnt < config.scaleLevel.Length; cnt++)
-        //{
-        //    if (tornadoScale >= config.scaleLevel[cnt])
-        //    {
-        //        config.tornadoTier = (TierType)cnt;
-        //    }
-        //}
-
-        int tornadoTierID = (int)config.tornadoTier;
-        int enumLenght = Enum.GetValues(typeof(TierType)).Length;
-
-        if (config.currentXP >= config.xpTiers[tornadoTierID])
-        {
-            if (++tornadoTierID < enumLenght)
-            {
-                config.tornadoTier = (TierType)tornadoTierID;
-
-                if (tornadoTierID == (enumLenght - 1))
-                {
-                    uiController.SetXPLable("max");
-                    EndTheGame();
-                }
-                else
-                {
-                    UpdateBlockerPrefab();
-                    UpdateXPLable();
-                }
-                uiController.SetTierLable(config.tornadoTier.ToString());
-
-                return true;
-            }
-        }
-
-        UpdateXPLable();
-
-        return false;
+        newTornadoC.Init(this, uiController, tornadoScale.x);
     }
 
     private GameObject GetTornadoPrefab(TornadoType newType)
@@ -172,7 +126,7 @@ public class CoreGameplayController : MonoBehaviour
 
     private TornadoType GetRandomTornado()
     {
-        float randomSeed = UnityEngine.Random.Range(0F, 1F);
+        float randomSeed = UnityEngine.Random.value;
 
         if (randomSeed >= .66F)
         {
@@ -188,9 +142,9 @@ public class CoreGameplayController : MonoBehaviour
         }
     }
 
-    private GameObject GetBlocker(TierType newBlockerTier)
+    private GameObject GetBlocker(int newBlockerTier)
     {
-        if (newBlockerTier > config.tornadoTier)
+        if (newBlockerTier > _tornadoLevel)
         {
             return prefabs.blockerRGO;
         }
@@ -202,7 +156,7 @@ public class CoreGameplayController : MonoBehaviour
 
     private GameObject GetRandomBlocker()
     {
-        float randomSeed = UnityEngine.Random.Range(0F, 1F);
+        float randomSeed = UnityEngine.Random.value;
 
         if (randomSeed >= .5F)
         {
@@ -218,30 +172,9 @@ public class CoreGameplayController : MonoBehaviour
         }
     }
 
-    private TierType GetRandomBlockerTier()
+    private int GetRandomBlockerTier()
     {
-        float randomSeed = UnityEngine.Random.Range(0F, 1F);
-        float dropChance = 0F;
-        int enumLenght = Enum.GetValues(typeof(TierType)).Length;
-        int tornadoTierID = (int)config.tornadoTier;
-        int diff = 0;
-        int blockerTierID = 0;
-        bool isBorderTier = GetIsBorderTier(tornadoTierID, enumLenght);
-
-        for (int cnt = 0; cnt < enumLenght; cnt++)
-        {
-            diff = Mathf.Abs(tornadoTierID - cnt);
-
-            dropChance = GetDropChance(isBorderTier, diff);
-            if (randomSeed < dropChance)
-            {
-                //Debug.Log("Chance: " + dropChance + ", Type: " + (TierType)blockerTierID);
-
-                blockerTierID = cnt;
-            }
-        }
-
-        return (TierType)blockerTierID;
+        return UnityEngine.Random.Range(1, _tornadoLevel + 3);
     }
 
     private float GetDropChance(bool isBorderTier, int diff)
@@ -264,18 +197,6 @@ public class CoreGameplayController : MonoBehaviour
         }
     }
 
-    private bool GetIsBorderTier(int tornadoTierID, int maxTierID)
-    {
-        if (tornadoTierID == 0 || tornadoTierID == maxTierID)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
     void Update()
     {
         //UpdateTimer();
@@ -294,22 +215,23 @@ public class CoreGameplayController : MonoBehaviour
         }
     }
 
-    public void UpdateBlockerPrefab()
+    public void UpdateBlockerPrefab(int level)
     {
-        int tornadoTierID = (int)config.tornadoTier;
+        _tornadoLevel = level;
+
         for (int cnt = 0; cnt < prefabs.blockersGO.transform.childCount; cnt++)
         {
             GameObject blockerGO = prefabs.blockersGO.transform.GetChild(cnt).gameObject;
             int blockerTierID = (int)blockerGO.GetComponent<BlockerModel>().blockerTier;
 
-            if (blockerGO.tag == "RedMarker" && tornadoTierID >= blockerTierID)
+            if (blockerGO.tag == "RedMarker" && level >= blockerTierID)
             {
                 Vector3 newBlockerPos = blockerGO.transform.position;
 
                 Destroy(blockerGO);
 
-                GameObject newBlocker = Instantiate(GetBlocker((TierType)blockerTierID), prefabs.blockersGO.transform);
-                newBlocker.GetComponent<BlockerModel>().blockerTier = (TierType)blockerTierID;
+                GameObject newBlocker = Instantiate(GetBlocker(blockerTierID), prefabs.blockersGO.transform);
+                newBlocker.GetComponent<BlockerModel>().blockerTier = blockerTierID;
                 newBlocker.transform.position = newBlockerPos;
                 newBlocker.transform.localScale = GetBlockerScale(newBlocker);
                 newBlocker.GetComponentInChildren<Rigidbody>().velocity += Vector3.back * config.boxMotionSpeed;
@@ -325,7 +247,7 @@ public class CoreGameplayController : MonoBehaviour
             {
                 Vector3 newBlockerPos = new Vector3(UnityEngine.Random.Range(config.borders.xMin, config.borders.xMax), 0F, 12F);
                 //TierType newBlockerTier = RandomEnumValue<TierType>();
-                TierType newBlockerTier = GetRandomBlockerTier();
+                int newBlockerTier = GetRandomBlockerTier();
 
                 GameObject newBlocker = Instantiate(GetBlocker(newBlockerTier), newBlockerPos, prefabs.blockersGO.transform.rotation, prefabs.blockersGO.transform);
                 BlockerModel newBlockerModel = newBlocker.GetComponent<BlockerModel>();
@@ -351,24 +273,9 @@ public class CoreGameplayController : MonoBehaviour
     private Vector3 GetBlockerScale(GameObject targetBlocker)
     {
         BlockerModel targetBlockerM = targetBlocker.GetComponent<BlockerModel>();
-        Vector3 currLocalScale = targetBlocker.transform.localScale;
+        float currScale = targetBlocker.transform.localScale .x + 0.25f * targetBlockerM.blockerTier;
 
-        switch (targetBlockerM.blockerTier)
-        {
-            case TierType.Great:
-                currLocalScale *= config.scaleLevel[3];
-                break;
-            case TierType.Big:
-                currLocalScale *= config.scaleLevel[2];
-                break;
-            case TierType.Medium:
-                currLocalScale *= config.scaleLevel[1];
-                break;
-            case TierType.Small:
-                currLocalScale *= config.scaleLevel[0];
-                break;
-        }
-        return currLocalScale;
+        return new Vector3(currScale, currScale * 0.01f, currScale);
     }
 
     //private void UpdateTimer()

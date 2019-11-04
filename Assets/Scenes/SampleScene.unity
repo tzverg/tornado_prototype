@@ -425,9 +425,9 @@ MonoBehaviour:
     modG: 0.1
     tornadoMotionSpeed: 5
     minSwipeDistance: 0.3
-    summonDelayMin: 2
-    summonDelayMax: 3
-    blockerMaxNumber: 10
+    summonDelayMin: 0.1
+    summonDelayMax: 0.5
+    blockerMaxNumber: 100
     boxMotionSpeed: 2
     chancesB:
     - 0.5
@@ -446,7 +446,6 @@ MonoBehaviour:
     - 3
     timerStartValue: 5
     currentXP: 0
-    xpTiers: 050000000a0000000f00000014000000
     tornadoType: 0
     tornadoTier: 0
   prefabs:
@@ -853,7 +852,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -10, y: -10}
-  m_SizeDelta: {x: 150, y: 40}
+  m_SizeDelta: {x: 250, y: 40}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &1483096018
 MonoBehaviour:
@@ -932,7 +931,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 10, y: -80}
-  m_SizeDelta: {x: 150, y: 40}
+  m_SizeDelta: {x: 250, y: 40}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1549997753
 MonoBehaviour:

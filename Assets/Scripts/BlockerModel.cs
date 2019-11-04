@@ -2,6 +2,6 @@
 
 public class BlockerModel : MonoBehaviour
 {
-    public TierType blockerTier;
+    public int blockerTier;
     public int XpForDestroy { get; set; }
 }

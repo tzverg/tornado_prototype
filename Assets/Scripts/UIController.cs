@@ -9,27 +9,15 @@ public class UIController : MonoBehaviour
     [SerializeField] private Text xpLable;
     [SerializeField] private Text tierLable;
 
-    private int scoreNum = 0;
-
-    public void AddScore(int value)
+    public void SetScoreLable(int value)
     {
-        scoreNum += value;
-        UpdateScore();
+        scoreLable.text = string.Format("{0}", value);
     }
 
-    public void UpdateScore()
+    public void SetXPLable(int level, int value, int max)
     {
-        scoreLable.text = "score: " + scoreNum;
-    }
-
-    public void SetXPLable(string value)
-    {
-        xpLable.text = "XP: " + value;
-    }
-
-    public void SetTierLable(string newTier)
-    {
-        tierLable.text = "Tier: " + newTier;
+        tierLable.text = string.Format("Level: {0}", level);
+        xpLable.text = string.Format("XP:{0}/{1}", value, max);
     }
 
     public void ShowMenuPanel()
