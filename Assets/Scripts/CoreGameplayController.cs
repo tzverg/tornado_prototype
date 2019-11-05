@@ -40,15 +40,21 @@ public class Configurations
 [Serializable]
 public class Prefabs
 {
-    public GameObject blockersGO;
+    [SerializeField] private GameObject _blockersGO;
+    [SerializeField] private GameObject _blockerRGO;
+    [SerializeField] private GameObject _blockerGGO;
+    [SerializeField] private GameObject _blockerBGO;
+    [SerializeField] private GameObject _tornadoLGO;
+    [SerializeField] private GameObject _tornadoFGO;
+    [SerializeField] private GameObject _tornadoIGO;
 
-    public GameObject blockerRGO;
-    public GameObject blockerGGO;
-    public GameObject blockerBGO;
-
-    public GameObject tornadoLGO;
-    public GameObject tornadoFGO;
-    public GameObject tornadoIGO;
+    public GameObject blockersGO => _blockersGO;
+    public GameObject blockerRGO => _blockerRGO;
+    public GameObject blockerGGO => _blockerGGO;
+    public GameObject blockerBGO => _blockerBGO;
+    public GameObject tornadoLGO => _tornadoLGO;
+    public GameObject tornadoFGO => _tornadoFGO;
+    public GameObject tornadoIGO => _tornadoIGO;
 }
 
 public class CoreGameplayController : MonoBehaviour
@@ -239,24 +245,36 @@ public class CoreGameplayController : MonoBehaviour
         }
     }
 
+    private Vector3 GetStartBlockPosition()
+    {
+        Vector3 newPosition = new Vector3(UnityEngine.Random.Range(config.borders.xMin, config.borders.xMax), 0F, config.borders.zMax + 2);
+        return newPosition;
+    }
+
+    private void InitBlock()
+    {
+        Vector3 newBlockerPos = GetStartBlockPosition();
+        int newBlockerTier = GetRandomBlockerTier();
+
+        GameObject newBlocker = Instantiate(GetBlocker(newBlockerTier), newBlockerPos, prefabs.blockersGO.transform.rotation, prefabs.blockersGO.transform);
+        BlockerModel newBlockerModel = newBlocker.GetComponent<BlockerModel>();
+
+        newBlockerModel.blockerTier = newBlockerTier;
+        newBlockerModel.XpForDestroy = (int)newBlockerTier + 1;
+
+        newBlocker.transform.SetParent(prefabs.blockersGO.transform);
+        newBlocker.transform.localScale = GetBlockerScale(newBlocker);
+        newBlocker.transform.localRotation = Quaternion.Euler(0F, UnityEngine.Random.Range(0, 360F), 0F);
+        newBlocker.GetComponentInChildren<Rigidbody>().velocity += Vector3.back * config.boxMotionSpeed;
+    }
+
     private IEnumerator SummonBlockers()
     {
         while (true)
         {
             if (prefabs.blockersGO.transform.childCount < config.blockerMaxNumber)
             {
-                Vector3 newBlockerPos = new Vector3(UnityEngine.Random.Range(config.borders.xMin, config.borders.xMax), 0F, 12F);
-                //TierType newBlockerTier = RandomEnumValue<TierType>();
-                int newBlockerTier = GetRandomBlockerTier();
-
-                GameObject newBlocker = Instantiate(GetBlocker(newBlockerTier), newBlockerPos, prefabs.blockersGO.transform.rotation, prefabs.blockersGO.transform);
-                BlockerModel newBlockerModel = newBlocker.GetComponent<BlockerModel>();
-                newBlockerModel.blockerTier = newBlockerTier;
-                newBlockerModel.XpForDestroy = (int)newBlockerTier + 1;
-                newBlocker.transform.SetParent(prefabs.blockersGO.transform);
-                newBlocker.transform.localScale = GetBlockerScale(newBlocker);
-                newBlocker.transform.localRotation = Quaternion.Euler(0F, UnityEngine.Random.Range(0, 360F), 0F);
-                newBlocker.GetComponentInChildren<Rigidbody>().velocity += Vector3.back * config.boxMotionSpeed;
+                InitBlock();
             }
 
             yield return new WaitForSeconds(UnityEngine.Random.Range(config.summonDelayMin, config.summonDelayMax));
@@ -273,23 +291,10 @@ public class CoreGameplayController : MonoBehaviour
     private Vector3 GetBlockerScale(GameObject targetBlocker)
     {
         BlockerModel targetBlockerM = targetBlocker.GetComponent<BlockerModel>();
-        float currScale = targetBlocker.transform.localScale .x + 0.25f * targetBlockerM.blockerTier;
+        float currScale = targetBlocker.transform.localScale.x + 0.25f * targetBlockerM.blockerTier;
 
         return new Vector3(currScale, currScale * 0.01f, currScale);
     }
-
-    //private void UpdateTimer()
-    //{
-    //    if (timerValue > 0)
-    //    {
-    //        timerValue -= Time.deltaTime;
-    //        uiController.Set((int)timerValue);
-    //    }
-    //    else
-    //    {
-    //        EndTheGame();
-    //    }
-    //}
 
     public void EndTheGame()
     {

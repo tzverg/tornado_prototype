@@ -11,13 +11,13 @@ public class UIController : MonoBehaviour
 
     public void SetScoreLable(int value)
     {
-        scoreLable.text = string.Format("{0}", value);
+        scoreLable.text = string.Format("Score: {0}", value);
     }
 
     public void SetXPLable(int level, int value, int max)
     {
         tierLable.text = string.Format("Level: {0}", level);
-        xpLable.text = string.Format("XP:{0}/{1}", value, max);
+        xpLable.text = string.Format("XP: {0}/{1}", value, max);
     }
 
     public void ShowMenuPanel()

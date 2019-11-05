@@ -45,6 +45,7 @@ public class TornadoController : MonoBehaviour
         _nextLevelXP = _level * _xpMultipler;
 
         _uiController.SetXPLable(_level, _currentXP, _nextLevelXP);
+        //_uiController.SetScoreLable(0F);
     }
 
     public void LevelUp()
