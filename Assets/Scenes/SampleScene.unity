@@ -449,18 +449,18 @@ MonoBehaviour:
     tornadoType: 0
     tornadoTier: 0
   prefabs:
-    blockersGO: {fileID: 283244881}
-    blockerRGO: {fileID: 6199326652059755257, guid: 413853710b6cdf046bd1452e73fb13ec,
+    _blockersGO: {fileID: 283244881}
+    _blockerRGO: {fileID: 6199326652059755257, guid: 413853710b6cdf046bd1452e73fb13ec,
       type: 3}
-    blockerGGO: {fileID: 5121470052911008796, guid: 97d0feb16833aef43ba32a8470ca6add,
+    _blockerGGO: {fileID: 5121470052911008796, guid: 97d0feb16833aef43ba32a8470ca6add,
       type: 3}
-    blockerBGO: {fileID: 7548429794840939482, guid: 1cdd96d62ac185b44b073d9ad377f545,
+    _blockerBGO: {fileID: 7548429794840939482, guid: 1cdd96d62ac185b44b073d9ad377f545,
       type: 3}
-    tornadoLGO: {fileID: 9173065022621489626, guid: 87fae29e125b1874ca0f25e967c7dd44,
+    _tornadoLGO: {fileID: 9173065022621489626, guid: 87fae29e125b1874ca0f25e967c7dd44,
       type: 3}
-    tornadoFGO: {fileID: 6452684281337934018, guid: 2c5c7dbd1feb53745802b3f03012a3ee,
+    _tornadoFGO: {fileID: 6452684281337934018, guid: 2c5c7dbd1feb53745802b3f03012a3ee,
       type: 3}
-    tornadoIGO: {fileID: 1725833605493554188, guid: 6e7530881ffde2a4ca1ad8086f730833,
+    _tornadoIGO: {fileID: 1725833605493554188, guid: 6e7530881ffde2a4ca1ad8086f730833,
       type: 3}
 --- !u!1 &705507993
 GameObject:
@@ -887,7 +887,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'score: 999'
+  m_Text: 'Score: 999'
 --- !u!222 &1483096019
 CanvasRenderer:
   m_ObjectHideFlags: 0
